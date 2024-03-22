@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Simulation from "../components/simulation";
-import Document from "../components/document";
 import { Link, Loader, Play, Stop } from "../lib/icons";
 import cn from "classnames";
+import dynamic from "next/dynamic"
 
 export default function Simulator() {
     const [view, setView] = useState<"document" | "both" | "simulation">(
@@ -57,6 +57,8 @@ export default function Simulator() {
     const handleRun = () => {
         setRunning(!running);
     }
+
+    const Document = dynamic(() => import('../components/document'))
 
     return (
         <div className="w-screen h-screen bg-background flex flex-col">

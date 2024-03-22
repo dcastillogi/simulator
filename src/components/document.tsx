@@ -1,3 +1,5 @@
+"use client";
+
 import EditorJS from "@editorjs/editorjs";
 // @ts-ignore
 import Table from "@editorjs/table";
@@ -8,13 +10,14 @@ export default function Document({ width }: { width: number }) {
     useEffect(() => {
         const editor = new EditorJS({
             placeholder: "Type your notes or document here",
+            holder: "editorjs",
             tools: {
                 table: Table,
             },
         });
 
         return () => {
-            editor.isReady.then(() => {
+            if (editor) editor.isReady.then(() => {
                 editor.destroy();
             });
         };
