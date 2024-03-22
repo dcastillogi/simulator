@@ -1,4 +1,5 @@
 import EditorJS from '@editorjs/editorjs';
+// @ts-ignore
 import Table from '@editorjs/table'
 import "./editorjs.css";
 
