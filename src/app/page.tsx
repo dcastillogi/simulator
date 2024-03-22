@@ -1,113 +1,130 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+import { useEffect, useState } from "react";
+import Simulation from "./components/simulation";
+import Document from "./components/document";
+import { Link, Loader, Play, Stop } from "./lib/icons";
+import cn from "classnames";
+
+export default function Simulator() {
+    const [view, setView] = useState<"document" | "both" | "simulation">(
+        "both"
+    );
+    const [loading, setLoading] = useState(true);
+    const [documentWidth, setDocumentWidth] = useState(0);
+    const [simulationWidth, setSimulationWidth] = useState(0);
+    const [running, setRunning] = useState(false);
+    useEffect(() => {
+        const screenWidth = window.innerWidth;
+        setDocumentWidth(screenWidth / 2);
+        setSimulationWidth(screenWidth / 2);
+        setTimeout(() => setLoading(false), 1000);
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="w-screen h-screen bg-background p-10">
+                <div className="w-full h-full grid place-items-center relative">
+                    <div className="flex gap-2 items-center">
+                        <Play className="w-8 h-8 text-primary" />
+                        <h1 className="text-lg text-primary mt-px">
+                            Let&apos;s Simulate
+                        </h1>
+                    </div>
+                    <div className="absolute bottom-0 left-0 text-primary/50 flex gap-2 items-center text-sm">
+                        <Loader className="w-5 h-5 animate-spin" />
+                        <span className="mt-px">Cargando simulador</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const selectView = (view: "document" | "both" | "simulation") => {
+        if (view == "document") {
+            setDocumentWidth(window.innerWidth);
+            setSimulationWidth(0);
+        } else if (view == "simulation") {
+            setDocumentWidth(0);
+            setSimulationWidth(window.innerWidth);
+        } else {
+            setDocumentWidth(window.innerWidth / 2);
+            setSimulationWidth(window.innerWidth / 2);
+        }
+        setView(view);
+    };
+
+    const handleRun = () => {
+        setRunning(!running);
+    }
+
+    return (
+        <div className="w-screen h-screen bg-background flex flex-col">
+            <header className="border-b border-border">
+                <div className="w-full py-2 px-4 grid grid-cols-3 items-center">
+                    <button onClick={handleRun} className="inline w-6 h-6">
+                        {
+                            running ? <Stop className="w-6 h-6 text-white/80 hover:text-white" /> : <Play className="w-6 h-6 text-white hover:text-white/80 transition-colors" />
+                        }
+                    </button>
+                    <div className="flex justify-center">
+                        <div className="rounded border-border border grid grid-cols-3 text-white text-[13px] divide-x divide-border">
+                            <button
+                                className={cn({
+                                    "py-1 px-2 transition-colors": true,
+                                    "bg-background-accent": view == "document",
+                                    "hover:bg-background-hover":
+                                        view != "document",
+                                })}
+                                onClick={() => selectView("document")}
+                            >
+                                Document
+                            </button>
+                            <button
+                                className={cn({
+                                    "py-1 px-2 transition-colors": true,
+                                    "bg-background-accent": view == "both",
+                                    "hover:bg-background-hover": view != "both",
+                                })}
+                                onClick={() => selectView("both")}
+                            >
+                                Both
+                            </button>
+                            <button
+                                className={cn({
+                                    "py-1 px-2 transition-colors": true,
+                                    "bg-background-accent":
+                                        view == "simulation",
+                                    "hover:bg-background-hover":
+                                        view != "simulation",
+                                })}
+                                onClick={() => selectView("simulation")}
+                            >
+                                Simulation
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                        <button className="py-1 px-3 text-[13px] text-white bg-accent rounded flex items-center gap-2">
+                            Share <Link className="h-3.5 w-auto" />
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <main className="flex flex-grow overflow-hidden">
+                {(view == "document" || view == "both") && (
+                    <Document width={documentWidth} />
+                )}
+                {view == "both" && (
+                    <div className="w-4 cursor-col-resize -ml-2 flex justify-center">
+                        <span className="h-full w-px bg-border"></span>
+                    </div>
+                )}
+                {(view == "simulation" || view == "both") && (
+                    <Simulation width={simulationWidth} />
+                )}
+            </main>
         </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    );
 }

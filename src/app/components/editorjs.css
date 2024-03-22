@@ -1,0 +1,19 @@
+.ce-paragraph[data-placeholder]:empty:before {
+    color: #a5a5a6 !important;
+    font-weight: 300 !important;
+}
+
+.ce-inline-toolbar__toggler-and-button-wrapper {
+    background: #3a3a3a !important;
+    border: 1px solid #3a3a3a !important;
+}
+
+#editorjs::-moz-selection {
+    background: #3a3a3a !important;
+    color: #fff !important;
+}
+
+#editorjs::selection {
+    background: #3a3a3a !important;
+    color: #fff !important;
+}
