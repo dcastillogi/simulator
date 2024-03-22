@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Simulation from "./components/simulation";
-import Document from "./components/document";
-import { Link, Loader, Play, Stop } from "./lib/icons";
+import Simulation from "../components/simulation";
+import Document from "../components/document";
+import { Link, Loader, Play, Stop } from "../lib/icons";
 import cn from "classnames";
 
 export default function Simulator() {
