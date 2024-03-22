@@ -1,27 +1,7 @@
-"use client";
-
-import EditorJS from "@editorjs/editorjs";
-// @ts-ignore
-import Table from "@editorjs/table";
-import "./editorjs.css";
-import { useEffect } from "react";
+import dynamic from "next/dynamic";
 
 export default function Document({ width }: { width: number }) {
-    useEffect(() => {
-        const editor = new EditorJS({
-            placeholder: "Type your notes or document here",
-            holder: "editorjs",
-            tools: {
-                table: Table,
-            },
-        });
-
-        return () => {
-            if (editor) editor.isReady.then(() => {
-                editor.destroy();
-            });
-        };
-    }, []);
+    const Editor = dynamic(() => import('./editor'))
     return (
         <div
             className="w-full h-full bg-background-dimmed py-8 overflow-y-auto"
@@ -34,7 +14,7 @@ export default function Document({ width }: { width: number }) {
                 >
                     Untitled Simulation
                 </h1>
-                <div id="editorjs" className="text-primary font-light"></div>
+                <Editor />
             </div>
         </div>
     );
